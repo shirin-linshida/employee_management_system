@@ -6,11 +6,8 @@ import com.example.employeeManagement.model.State;
 import com.example.employeeManagement.repository.CountryRepository;
 import com.example.employeeManagement.repository.StateRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import java.util.List;
+
 import java.util.Optional;
 
 @Service
@@ -22,16 +19,8 @@ public class StateService {
     @Autowired
     private CountryRepository countryRepository;
 
-    public List<State> getAllStates() {
-        return stateRepository.findAll();
-    }
-
     public Optional<State> getStateById(Long id) {
         return stateRepository.findById(id);
-    }
-
-    public Page<State> getStates(Specification<State> spec, Pageable pageable) {
-        return stateRepository.findAll(spec, pageable);
     }
 
     public State createOrUpdateState(StateRequest stateRequest) {

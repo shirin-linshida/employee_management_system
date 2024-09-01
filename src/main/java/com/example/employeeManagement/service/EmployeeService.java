@@ -4,6 +4,8 @@ import com.example.employeeManagement.dto.EmployeeRequest;
 import com.example.employeeManagement.model.*;
 import com.example.employeeManagement.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
@@ -12,8 +14,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Page;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;

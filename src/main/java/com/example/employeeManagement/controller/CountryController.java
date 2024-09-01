@@ -1,7 +1,9 @@
 package com.example.employeeManagement.controller;
 
 import com.example.employeeManagement.model.Country;
+import com.example.employeeManagement.repository.CountryRepository;
 import com.example.employeeManagement.service.CountryService;
+import com.example.employeeManagement.service.PaginationSortingAndFilteringService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -21,6 +23,12 @@ public class CountryController {
     @Autowired
     private CountryService countryService;
 
+    @Autowired
+    private PaginationSortingAndFilteringService paginationAndFilteringService;
+
+    @Autowired
+    private CountryRepository countryRepository;
+
     @GetMapping
     @PreAuthorize("hasRole('ADMIN') or hasRole('STAFF')")
     public ResponseEntity<Page<Country>> getAllCountries(
@@ -30,15 +38,7 @@ public class CountryController {
             @RequestParam(defaultValue = "asc") String sortDir,
             @RequestParam(required = false) String name) {
 
-        // Sorting
-        Sort sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name())
-                ? Sort.by(sortField).ascending()
-                : Sort.by(sortField).descending();
-
-        // Pagination
-        Pageable pageable = PageRequest.of(page, size, sort);
-
-        // Filtering Specification
+        // Creating the filtering specification
         Specification<Country> spec = Specification.where(null);
 
         if (name != null && !name.isEmpty()) {
@@ -46,8 +46,9 @@ public class CountryController {
                     criteriaBuilder.like(criteriaBuilder.lower(root.get("name")), "%" + name.toLowerCase() + "%"));
         }
 
-        // Fetching paginated and filtered results
-        Page<Country> countries = countryService.getCountries(spec, pageable);
+        // Using the shared service to get paginated, sorted, and filtered results
+        Page<Country> countries = paginationAndFilteringService.getPaginatedAndFilteredResults(
+                page, size, sortField, sortDir, spec, countryRepository);
 
         return ResponseEntity.ok(countries);
     }

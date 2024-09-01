@@ -2,7 +2,9 @@ package com.example.employeeManagement.controller;
 
 import com.example.employeeManagement.dto.CityRequest;
 import com.example.employeeManagement.model.City;
+import com.example.employeeManagement.repository.CityRepository;
 import com.example.employeeManagement.service.CityService;
+import com.example.employeeManagement.service.PaginationSortingAndFilteringService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -23,6 +25,12 @@ public class CityController {
     @Autowired
     private CityService cityService;
 
+    @Autowired
+    private CityRepository cityRepository;
+
+    @Autowired
+    private PaginationSortingAndFilteringService paginationSortingAndFilteringService;
+
     @GetMapping
     @PreAuthorize("hasRole('ADMIN') or hasRole('STAFF')")
     public ResponseEntity<Page<City>> getAllCities(
@@ -32,14 +40,6 @@ public class CityController {
             @RequestParam(defaultValue = "asc") String sortDir,
             @RequestParam(required = false) String name,
             @RequestParam(required = false) Long stateId) {
-
-        // Sorting
-        Sort sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name())
-                ? Sort.by(sortField).ascending()
-                : Sort.by(sortField).descending();
-
-        // Pagination
-        Pageable pageable = PageRequest.of(page, size, sort);
 
         // Filtering Specification
         Specification<City> spec = Specification.where(null);
@@ -54,8 +54,9 @@ public class CityController {
                     criteriaBuilder.equal(root.get("state").get("id"), stateId));
         }
 
-        // Fetching paginated and filtered results
-        Page<City> cities = cityService.getCities(spec, pageable);
+        // Fetching paginated and filtered results using the shared service
+        Page<City> cities = paginationSortingAndFilteringService.getPaginatedAndFilteredResults(
+                page, size, sortField, sortDir, spec, cityRepository);
 
         return ResponseEntity.ok(cities);
     }

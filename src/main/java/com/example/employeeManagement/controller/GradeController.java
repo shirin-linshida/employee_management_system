@@ -1,7 +1,9 @@
 package com.example.employeeManagement.controller;
 
 import com.example.employeeManagement.model.Grade;
+import com.example.employeeManagement.repository.GradeRepository;
 import com.example.employeeManagement.service.GradeService;
+import com.example.employeeManagement.service.PaginationSortingAndFilteringService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
@@ -20,6 +22,12 @@ public class GradeController {
     @Autowired
     private GradeService gradeService;
 
+    @Autowired
+    private PaginationSortingAndFilteringService paginationAndFilteringService;
+
+    @Autowired
+    private GradeRepository gradeRepository;
+
     @GetMapping
     @PreAuthorize("hasRole('ADMIN') or hasRole('STAFF')")
     public ResponseEntity<Page<Grade>> getAllGrades(
@@ -29,15 +37,7 @@ public class GradeController {
             @RequestParam(defaultValue = "asc") String sortDir,
             @RequestParam(required = false) String name) {
 
-        // Sorting
-        Sort sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name())
-                ? Sort.by(sortField).ascending()
-                : Sort.by(sortField).descending();
-
-        // Pagination
-        Pageable pageable = PageRequest.of(page, size, sort);
-
-        // Filtering Specification
+        // Creating the filtering specification
         Specification<Grade> spec = Specification.where(null);
 
         if (name != null && !name.isEmpty()) {
@@ -45,8 +45,9 @@ public class GradeController {
                     criteriaBuilder.like(criteriaBuilder.lower(root.get("name")), "%" + name.toLowerCase() + "%"));
         }
 
-        // Fetching paginated and filtered results
-        Page<Grade> grades = gradeService.getGrades(spec, pageable);
+        // Using the shared service to get paginated, sorted, and filtered results
+        Page<Grade> grades = paginationAndFilteringService.getPaginatedAndFilteredResults(
+                page, size, sortField, sortDir, spec, gradeRepository);
 
         return ResponseEntity.ok(grades);
     }

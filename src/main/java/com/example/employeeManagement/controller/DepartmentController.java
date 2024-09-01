@@ -3,7 +3,6 @@ package com.example.employeeManagement.controller;
 import com.example.employeeManagement.model.Department;
 import com.example.employeeManagement.repository.DepartmentRepository;
 import com.example.employeeManagement.service.DepartmentService;
-import com.example.employeeManagement.service.PaginationAndSortingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -18,9 +17,6 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/api/departments")
 public class DepartmentController {
-
-    @Autowired
-    private PaginationAndSortingService paginationAndSortingService;
 
     @Autowired
     private DepartmentService departmentService;

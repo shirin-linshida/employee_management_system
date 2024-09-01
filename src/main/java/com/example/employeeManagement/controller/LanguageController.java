@@ -1,7 +1,9 @@
 package com.example.employeeManagement.controller;
 
 import com.example.employeeManagement.model.Language;
+import com.example.employeeManagement.repository.LanguageRepository;
 import com.example.employeeManagement.service.LanguageService;
+import com.example.employeeManagement.service.PaginationSortingAndFilteringService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -20,6 +22,12 @@ public class LanguageController {
     @Autowired
     private LanguageService languageService;
 
+    @Autowired
+    private PaginationSortingAndFilteringService paginationAndFilteringService;
+
+    @Autowired
+    private LanguageRepository languageRepository;
+
     @GetMapping
     @PreAuthorize("hasRole('ADMIN') or hasRole('STAFF')")
     public ResponseEntity<Page<Language>> getAllLanguages(
@@ -29,15 +37,7 @@ public class LanguageController {
             @RequestParam(defaultValue = "asc") String sortDir,
             @RequestParam(required = false) String name) {
 
-        // Sorting
-        Sort sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name())
-                ? Sort.by(sortField).ascending()
-                : Sort.by(sortField).descending();
-
-        // Pagination
-        Pageable pageable = PageRequest.of(page, size, sort);
-
-        // Filtering Specification
+        // Creating the filtering specification
         Specification<Language> spec = Specification.where(null);
 
         if (name != null && !name.isEmpty()) {
@@ -45,8 +45,9 @@ public class LanguageController {
                     criteriaBuilder.like(criteriaBuilder.lower(root.get("name")), "%" + name.toLowerCase() + "%"));
         }
 
-        // Fetching paginated and filtered results
-        Page<Language> languages = languageService.getLanguages(spec, pageable);
+        // Using the shared service to get paginated, sorted, and filtered results
+        Page<Language> languages = paginationAndFilteringService.getPaginatedAndFilteredResults(
+                page, size, sortField, sortDir, spec, languageRepository);
 
         return ResponseEntity.ok(languages);
     }

@@ -2,17 +2,15 @@ package com.example.employeeManagement.service;
 
 import com.example.employeeManagement.dto.CityRequest;
 import com.example.employeeManagement.model.City;
-import com.example.employeeManagement.model.Country;
 import com.example.employeeManagement.model.State;
 import com.example.employeeManagement.repository.CityRepository;
-import com.example.employeeManagement.repository.CountryRepository;
 import com.example.employeeManagement.repository.StateRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import java.util.List;
 import java.util.Optional;
 

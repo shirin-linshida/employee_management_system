@@ -2,7 +2,9 @@ package com.example.employeeManagement.controller;
 
 import com.example.employeeManagement.dto.EmployeeRequest;
 import com.example.employeeManagement.model.Employee;
+import com.example.employeeManagement.repository.EmployeeRepository;
 import com.example.employeeManagement.service.EmployeeService;
+import com.example.employeeManagement.service.PaginationSortingAndFilteringService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -25,7 +27,14 @@ public class EmployeeController {
     @Autowired
     private EmployeeService employeeService;
 
+    @Autowired
+    private PaginationSortingAndFilteringService paginationAndFilteringService;
+
+    @Autowired
+    private EmployeeRepository employeeRepository;
+
     @GetMapping
+    @PreAuthorize("hasRole('ADMIN') or hasRole('STAFF')")
     public ResponseEntity<Page<Employee>> getAllEmployees(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
@@ -34,15 +43,7 @@ public class EmployeeController {
             @RequestParam(required = false) String firstName,
             @RequestParam(required = false) String lastName) {
 
-        // Sorting
-        Sort sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name())
-                ? Sort.by(sortField).ascending()
-                : Sort.by(sortField).descending();
-
-        // Pagination
-        Pageable pageable = PageRequest.of(page, size, sort);
-
-        // Filtering Specification
+        // Creating the filtering specification
         Specification<Employee> spec = Specification.where(null);
 
         if (firstName != null && !firstName.isEmpty()) {
@@ -55,8 +56,9 @@ public class EmployeeController {
                     criteriaBuilder.like(criteriaBuilder.lower(root.get("lastName")), "%" + lastName.toLowerCase() + "%"));
         }
 
-        // Fetching paginated and filtered results
-        Page<Employee> employees = employeeService.getEmployees(spec, pageable);
+        // Using the shared service to get paginated, sorted, and filtered results
+        Page<Employee> employees = paginationAndFilteringService.getPaginatedAndFilteredResults(
+                page, size, sortField, sortDir, spec, employeeRepository);
 
         return ResponseEntity.ok(employees);
     }

@@ -2,6 +2,8 @@ package com.example.employeeManagement.controller;
 
 import com.example.employeeManagement.dto.StateRequest;
 import com.example.employeeManagement.model.State;
+import com.example.employeeManagement.repository.StateRepository;
+import com.example.employeeManagement.service.PaginationSortingAndFilteringService;
 import com.example.employeeManagement.service.StateService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -21,6 +23,13 @@ public class StateController {
     @Autowired
     private StateService stateService;
 
+    @Autowired
+    private StateRepository stateRepository;
+
+    @Autowired
+    private PaginationSortingAndFilteringService paginationAndFilteringService;
+
+
     @GetMapping
     @PreAuthorize("hasRole('ADMIN') or hasRole('STAFF')")
     public ResponseEntity<Page<State>> getAllStates(
@@ -30,14 +39,6 @@ public class StateController {
             @RequestParam(defaultValue = "asc") String sortDir,
             @RequestParam(required = false) String name) {
 
-        // Sorting
-        Sort sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name())
-                ? Sort.by(sortField).ascending()
-                : Sort.by(sortField).descending();
-
-        // Pagination
-        Pageable pageable = PageRequest.of(page, size, sort);
-
         // Filtering Specification
         Specification<State> spec = Specification.where(null);
 
@@ -46,8 +47,9 @@ public class StateController {
                     criteriaBuilder.like(criteriaBuilder.lower(root.get("name")), "%" + name.toLowerCase() + "%"));
         }
 
-        // Fetching paginated and filtered results
-        Page<State> states = stateService.getStates(spec, pageable);
+        // Fetching paginated and filtered results using the shared service
+        Page<State> states = paginationAndFilteringService.getPaginatedAndFilteredResults(
+                page, size, sortField, sortDir, spec, stateRepository);
 
         return ResponseEntity.ok(states);
     }

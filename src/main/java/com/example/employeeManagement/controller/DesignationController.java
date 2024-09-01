@@ -2,7 +2,9 @@ package com.example.employeeManagement.controller;
 
 import com.example.employeeManagement.dto.DesignationRequest;
 import com.example.employeeManagement.model.Designation;
+import com.example.employeeManagement.repository.DesignationRepository;
 import com.example.employeeManagement.service.DesignationService;
+import com.example.employeeManagement.service.PaginationSortingAndFilteringService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -22,6 +24,12 @@ public class DesignationController {
     @Autowired
     private DesignationService designationService;
 
+    @Autowired
+    private PaginationSortingAndFilteringService paginationAndFilteringService;
+
+    @Autowired
+    private DesignationRepository designationRepository;
+
     @GetMapping
     @PreAuthorize("hasRole('ADMIN') or hasRole('STAFF')")
     public ResponseEntity<Page<Designation>> getAllDesignations(
@@ -32,15 +40,7 @@ public class DesignationController {
             @RequestParam(required = false) String name,
             @RequestParam(required = false) Long departmentId) {
 
-        // Sorting
-        Sort sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name())
-                ? Sort.by(sortField).ascending()
-                : Sort.by(sortField).descending();
-
-        // Pagination
-        Pageable pageable = PageRequest.of(page, size, sort);
-
-        // Filtering Specification
+        // Creating the filtering specification
         Specification<Designation> spec = Specification.where(null);
 
         if (name != null && !name.isEmpty()) {
@@ -53,8 +53,9 @@ public class DesignationController {
                     criteriaBuilder.equal(root.get("department").get("id"), departmentId));
         }
 
-        // Fetching paginated and filtered results
-        Page<Designation> designations = designationService.getDesignations(spec, pageable);
+        // Using the shared service to get paginated, sorted, and filtered results
+        Page<Designation> designations = paginationAndFilteringService.getPaginatedAndFilteredResults(
+                page, size, sortField, sortDir, spec, designationRepository);
 
         return ResponseEntity.ok(designations);
     }
