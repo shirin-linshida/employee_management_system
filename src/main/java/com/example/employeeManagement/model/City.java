@@ -14,15 +14,15 @@ public class City {
     private String name;
 
     @ManyToOne
-    @JoinColumn(name = "country_id", nullable = false)
-    private Country country;
+    @JoinColumn(name = "state_id", nullable = false) // Link City to State
+    private State state;  // Updated to link with State instead of Country
 
-    public Country getCountry() {
-        return country;
+    public State getState() {
+        return state;
     }
 
-    public void setCountry(Country country) {
-        this.country = country;
+    public void setState(State state) {
+        this.state = state;
     }
 
     public Long getId() {

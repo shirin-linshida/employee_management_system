@@ -4,9 +4,8 @@ public class CityRequest {
 
     private Long id;
     private String name;
-    private Long country_id;
+    private Long state_id;
 
-    // Getters and Setters
     public Long getId() {
         return id;
     }
@@ -23,11 +22,11 @@ public class CityRequest {
         this.name = name;
     }
 
-    public Long getCountry_id() {
-        return country_id;
+    public Long getState_id() {
+        return state_id;
     }
 
-    public void setCountry_id(Long country_id) {
-        this.country_id = country_id;
+    public void setState_id(Long state_id) {
+        this.state_id = state_id;
     }
 }

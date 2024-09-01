@@ -3,8 +3,10 @@ package com.example.employeeManagement.service;
 import com.example.employeeManagement.dto.CityRequest;
 import com.example.employeeManagement.model.City;
 import com.example.employeeManagement.model.Country;
+import com.example.employeeManagement.model.State;
 import com.example.employeeManagement.repository.CityRepository;
 import com.example.employeeManagement.repository.CountryRepository;
+import com.example.employeeManagement.repository.StateRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -18,7 +20,7 @@ public class CityService {
     private CityRepository cityRepository;
 
     @Autowired
-    private CountryRepository countryRepository;
+    private StateRepository stateRepository;
 
     public List<City> getAllCities() {
         return cityRepository.findAll();
@@ -42,11 +44,11 @@ public class CityService {
         city.setName(cityRequest.getName());
 
         // Fetch the country by ID and set it to the city
-        Optional<Country> countryOptional = countryRepository.findById(cityRequest.getCountry_id());
-        if (countryOptional.isPresent()) {
-            city.setCountry(countryOptional.get());
+        Optional<State> stateOptional = stateRepository.findById(cityRequest.getState_id());
+        if (stateOptional.isPresent()) {
+            city.setState(stateOptional.get());
         } else {
-            throw new RuntimeException("Country not found with ID: " + cityRequest.getCountry_id());
+            throw new RuntimeException("Country not found with ID: " + cityRequest.getState_id());
         }
 
         return cityRepository.save(city);
