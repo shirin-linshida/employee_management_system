@@ -1,0 +1,53 @@
+# DataSource Configuration
+spring:
+  thymeleaf:
+    prefix: classpath:/templates/
+    suffix: .html
+    mode: HTML
+    encoding: UTF-8
+    cache: false
+
+  server:
+    port: 8080
+
+  logging:
+    level:
+      root: INFO
+      org.springframework: DEBUG
+      com.example.employeeManagement: DEBUG
+
+  datasource:
+    url: jdbc:mysql://localhost:3306/employee_management
+    username: root
+    password: Kiebot@123
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+  h2:
+    console:
+      enabled: false
+
+  security:
+    user:
+      name: user
+      password: password
+
+  cache:
+    guava:
+      maximumSize: 100
+      expireAfterWrite: 10m
+
+  main:
+    allow-bean-definition-overriding: true
+
+jwt:
+  header: Authorization
+  secret: wTL5DXgrHJhbBMpsg9dtMQ+5f/MxyJGMlTXrZ/QlqLw=   # Replace this with your actual secret key
+  expiration-time: 86400000 # Token expiration time in milliseconds (1 day in this example)
+
+logging:
+  level:
+    org.springframework.security: DEBUG
+

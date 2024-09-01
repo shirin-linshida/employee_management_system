@@ -1,0 +1,58 @@
+package com.example.employeeManagement.service;
+
+import com.example.employeeManagement.dto.CityRequest;
+import com.example.employeeManagement.model.City;
+import com.example.employeeManagement.model.Country;
+import com.example.employeeManagement.repository.CityRepository;
+import com.example.employeeManagement.repository.CountryRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.Optional;
+
+@Service
+public class CityService {
+
+    @Autowired
+    private CityRepository cityRepository;
+
+    @Autowired
+    private CountryRepository countryRepository;
+
+    public List<City> getAllCities() {
+        return cityRepository.findAll();
+    }
+
+    public Optional<City> getCityById(Long id) {
+        return cityRepository.findById(id);
+    }
+
+    public City createOrUpdateCity(CityRequest cityRequest) {
+        City city = new City();
+        if (cityRequest.getId() != null) {
+            Optional<City> existingCity = cityRepository.findById(cityRequest.getId());
+            if (existingCity.isPresent()) {
+                city = existingCity.get();
+            } else {
+                throw new RuntimeException("City not found with ID: " + cityRequest.getId());
+            }
+        }
+
+        city.setName(cityRequest.getName());
+
+        // Fetch the country by ID and set it to the city
+        Optional<Country> countryOptional = countryRepository.findById(cityRequest.getCountry_id());
+        if (countryOptional.isPresent()) {
+            city.setCountry(countryOptional.get());
+        } else {
+            throw new RuntimeException("Country not found with ID: " + cityRequest.getCountry_id());
+        }
+
+        return cityRepository.save(city);
+    }
+
+    public void deleteCity(Long id) {
+        cityRepository.deleteById(id);
+    }
+}
