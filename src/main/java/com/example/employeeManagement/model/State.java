@@ -15,7 +15,7 @@ public class State {
 
     @ManyToOne
     @JoinColumn(name = "country_id", nullable = false)
-    private Country country;  // State is linked to Country
+    private Country country;
 
     public Long getId() {
         return id;

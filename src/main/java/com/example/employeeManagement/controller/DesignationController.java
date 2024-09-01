@@ -1,5 +1,6 @@
 package com.example.employeeManagement.controller;
 
+import com.example.employeeManagement.dto.DesignationRequest;
 import com.example.employeeManagement.model.Designation;
 import com.example.employeeManagement.service.DesignationService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,15 +31,15 @@ public class DesignationController {
 
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
-    public Designation createDesignation(@RequestBody Designation designation) {
-        return designationService.createOrUpdateDesignation(designation);
+    public Designation createDesignation(@RequestBody DesignationRequest designationRequest) {
+        return designationService.createOrUpdateDesignation(designationRequest);
     }
 
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public Designation updateDesignation(@PathVariable Long id, @RequestBody Designation designation) {
-        designation.setId(id);
-        return designationService.createOrUpdateDesignation(designation);
+    public Designation updateDesignation(@PathVariable Long id, @RequestBody DesignationRequest designationRequest) {
+        designationRequest.setId(id);
+        return designationService.createOrUpdateDesignation(designationRequest);
     }
 
     @DeleteMapping("/{id}")

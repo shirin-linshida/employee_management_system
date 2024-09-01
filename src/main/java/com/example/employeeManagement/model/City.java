@@ -14,8 +14,8 @@ public class City {
     private String name;
 
     @ManyToOne
-    @JoinColumn(name = "state_id", nullable = false) // Link City to State
-    private State state;  // Updated to link with State instead of Country
+    @JoinColumn(name = "state_id", nullable = false)
+    private State state;
 
     public State getState() {
         return state;

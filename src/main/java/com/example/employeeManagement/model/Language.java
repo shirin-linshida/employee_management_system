@@ -13,7 +13,7 @@ public class Language {
     @Column(unique = true, nullable = false)
     private String name;
 
-    // Getters and Setters
+
     public Long getId() {
         return id;
     }
