@@ -1,23 +1,22 @@
 package com.example.employeeManagement.service;
 
+import com.example.employeeManagement.controller.AuthenticationController;
 import com.example.employeeManagement.dto.EmployeeRequest;
 import com.example.employeeManagement.model.*;
 import com.example.employeeManagement.repository.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.access.AccessDeniedException;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 public class EmployeeService {
@@ -58,6 +57,8 @@ public class EmployeeService {
     @Autowired
     private AuthenticationService authenticationService;
 
+    private static final Logger logger = LoggerFactory.getLogger(AuthenticationController.class);
+
 
     public List<Employee> getAllEmployees() {
         return employeeRepository.findAll();
@@ -72,46 +73,78 @@ public class EmployeeService {
     }
 
     public Employee createOrUpdateEmployee(EmployeeRequest employeeRequest) {
-        Employee employee = new Employee();
+        Employee employee;
         boolean isNew = employeeRequest.getId() == null;
 
-        if (!isNew) { //If Editing
-            Optional<Employee> existingEmployee = employeeRepository.findById(employeeRequest.getId());
-            if (existingEmployee.isPresent()) {
-                employee = existingEmployee.get();
+        if (!isNew) { // If Editing
+            Optional<Employee> existingEmployeeOpt = employeeRepository.findById(employeeRequest.getId());
+            if (existingEmployeeOpt.isPresent()) {
+                employee = existingEmployeeOpt.get();
 
                 // Fetch the current user's ID and role
                 Long currentUserId = authenticationService.getCurrentUserId();
                 boolean isCurrentUserStaff = authenticationService.isStaff();
 
+                // Fetch the current employee's ID using the user's ID
+                Long currentEmployeeId = getCurrentEmployeeId(currentUserId)
+                        .orElseThrow(() -> new IllegalStateException("No employee record found for the current user"));
+
+                // Log details for debugging and security checks
+                logger.info("Attempting to update employee. Current user ID: {}, Is staff: {}, Employee ID: {}, Request ID: {}, Current employee ID: {}",
+                        currentUserId, isCurrentUserStaff, employee.getId(), employeeRequest.getId(), currentEmployeeId);
+
                 // Check if the user is a staff member and is trying to update a different employee
-                if ((currentUserId != employeeRequest.getId()) && isCurrentUserStaff && !employee.getId().equals(currentUserId)) {
+                if (isCurrentUserStaff && !employee.getId().equals(currentEmployeeId)){
                     throw new AccessDeniedException("You do not have permission to update this employee record.");
                 }
             } else {
                 throw new RuntimeException("Employee not found with ID: " + employeeRequest.getId());
             }
+        } else { // If Creating
+            employee = new Employee();
         }
 
-        // Set employee details
-        employee.setFirstName(employeeRequest.getFirstName());
-        employee.setLastName(employeeRequest.getLastName());
-        employee.setPlace(employeeRequest.getPlace());
-        employee.setEmail(employeeRequest.getEmail());
-        employee.setPhone(employeeRequest.getPhone());
-
-        // Fetch and set related entities
-        employee.setCountry(fetchCountry(employeeRequest.getCountry_id()));
-        employee.setState(fetchState(employeeRequest.getState_id()));
-        employee.setCity(fetchCity(employeeRequest.getCity_id()));
-        employee.setRole(fetchRole(employeeRequest.getRole_id()));
-        employee.setDepartment(fetchDepartment(employeeRequest.getDepartment_id()));
-        employee.setDesignation(fetchDesignation(employeeRequest.getDesignation_id()));
-        employee.setGrade(fetchGrade(employeeRequest.getGrade_id()));
-
-        // Fetch and set languages
-        List<Language> languages = fetchLanguages(employeeRequest.getLanguage_ids());
-        employee.setLanguages(languages);
+        // Update only the fields provided in the request
+        if (employeeRequest.getFirstName() != null) {
+            employee.setFirstName(employeeRequest.getFirstName());
+        }
+        if (employeeRequest.getLastName() != null) {
+            employee.setLastName(employeeRequest.getLastName());
+        }
+        if (employeeRequest.getPlace() != null) {
+            employee.setPlace(employeeRequest.getPlace());
+        }
+        if (employeeRequest.getEmail() != null) {
+            employee.setEmail(employeeRequest.getEmail());
+        }
+        if (employeeRequest.getPhone() != null) {
+            employee.setPhone(employeeRequest.getPhone());
+        }
+        if (employeeRequest.getCountry_id() != null) {
+            employee.setCountry(fetchCountry(employeeRequest.getCountry_id()));
+        }
+        if (employeeRequest.getState_id() != null) {
+            employee.setState(fetchState(employeeRequest.getState_id()));
+        }
+        if (employeeRequest.getCity_id() != null) {
+            employee.setCity(fetchCity(employeeRequest.getCity_id()));
+        }
+        if (employeeRequest.getRole_id() != null) {
+            employee.setRole(fetchRole(employeeRequest.getRole_id()));
+        }
+        if (employeeRequest.getDepartment_id() != null) {
+            employee.setDepartment(fetchDepartment(employeeRequest.getDepartment_id()));
+        }
+        if (employeeRequest.getDesignation_id() != null) {
+            employee.setDesignation(fetchDesignation(employeeRequest.getDesignation_id()));
+        }
+        if (employeeRequest.getGrade_id() != null) {
+            employee.setGrade(fetchGrade(employeeRequest.getGrade_id()));
+        }
+        if (employeeRequest.getLanguage_ids() != null) {
+            List<Language> languages = fetchLanguages(employeeRequest.getLanguage_ids());
+            employee.setLanguages(languages);
+        }
 
         // Save employee first
         Employee savedEmployee = employeeRepository.save(employee);
@@ -128,19 +161,18 @@ public class EmployeeService {
                     .orElseThrow(() -> new RuntimeException("ROLE_STAFF role not found"));
 
             // Save the user
-            User createdUser = userRepository.save(newUser);
-
-            // Initialize roles if needed
-            createdUser.setRoles(new HashSet<>()); // Assuming roles are stored in a set
-            createdUser.getRoles().add(staffRole);
-
-            // Save user with role
-            userRepository.save(createdUser);
+            newUser.setRoles(new HashSet<>());
+            newUser.getRoles().add(staffRole);
+            userRepository.save(newUser);
         }
 
         return savedEmployee;
     }
 
+
+    public Optional<Long> getCurrentEmployeeId(Long currentUserId) {
+        return employeeRepository.findEmployeeIdByUserId(currentUserId);
+    }
 
     private Country fetchCountry(Long id) {
         return countryRepository.findById(id).orElseThrow(() -> new RuntimeException("Country not found with ID: " + id));
@@ -176,25 +208,5 @@ public class EmployeeService {
 
     public void deleteEmployee(Long id) {
         employeeRepository.deleteById(id);
-    }
-
-    public void logCurrentUserRoles() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication != null) {
-            String roles = authentication.getAuthorities().stream()
-                    .map(GrantedAuthority::getAuthority)
-                    .collect(Collectors.joining(", "));
-            System.out.println("Current user roles: " + roles);
-        } else {
-            System.out.println("No authentication details found");
-        }
-    }
-
-    public void ensureAdminAccess() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        System.out.println("Authentication............ " + authentication);
-        if (authentication != null && authentication.getAuthorities().stream().noneMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_ADMIN"))) {
-            throw new AccessDeniedException("Access denied: Only admins can create employees.");
-        }
     }
 }

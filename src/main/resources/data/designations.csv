@@ -1,0 +1,51 @@
+id,name,department_id
+1,HR Manager,1
+2,HR Assistant,1
+3,Recruiter,1
+4,HR Director,1
+5,HR Coordinator,1
+6,Finance Manager,2
+7,Accountant,2
+8,Financial Analyst,2
+9,Tax Specialist,2
+10,Finance Director,2
+11,Software Engineer,3
+12,Systems Analyst,3
+13,DevOps Engineer,3
+14,QA Tester,3
+15,Engineering Manager,3
+16,Sales Manager,4
+17,Sales Representative,4
+18,Sales Analyst,4
+19,Sales Director,4
+20,Account Executive,4
+21,Marketing Manager,5
+22,Digital Marketer,5
+23,Content Creator,5
+24,SEO Specialist,5
+25,Marketing Director,5
+26,Product Manager,6
+27,Product Analyst,6
+28,Product Designer,6
+29,Product Marketing Manager,6
+30,Product Director,6
+31,Support Specialist,7
+32,Customer Service Manager,7
+33,Technical Support Specialist,7
+34,Customer Success Manager,7
+35,Support Director,7
+36,Legal Counsel,8
+37,Paralegal,8
+38,Compliance Officer,8
+39,Legal Assistant,8
+40,Legal Director,8
+41,IT Support Specialist,9
+42,Network Administrator,9
+43,IT Manager,9
+44,Systems Administrator,9
+45,IT Director,9
+46,R&D Scientist,11
+47,Research Analyst,11
+48,Development Engineer,11
+49,Lab Technician,11
+50,Innovation Manager,11

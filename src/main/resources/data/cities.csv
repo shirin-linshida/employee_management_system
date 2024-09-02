@@ -1,0 +1,53 @@
+id,name,state_id
+1,Los Angeles,1
+2,San Francisco,1
+3,San Diego,1
+4,San Jose,1
+5,Fresno,1
+6,Toronto,6
+7,Ottawa,6
+8,Mississauga,6
+9,Brampton,6
+10,Hamilton,6
+11,Mumbai,11
+12,Pune,11
+13,Nagpur,11
+14,Nashik,11
+15,Thane,11
+16,London,16
+17,Birmingham,16
+18,Manchester,16
+19,Leeds,16
+20,Sheffield,16
+21,Sydney,21
+22,Melbourne,21
+23,Brisbane,21
+24,Perth,21
+25,Adelaide,21
+26,Paris,26
+27,Lyon,26
+28,Marseille,26
+29,Toulouse,26
+30,Nice,26
+31,Munich,31
+32,Frankfurt,31
+33,Düsseldorf,31
+34,Cologne,31
+35,Stuttgart,31
+36,Rome,36
+37,Milan,36
+38,Naples,36
+39,Turin,36
+40,Florence,36
+41,Madrid,41
+42,Barcelona,41
+43,Valencia,41
+44,Seville,41
+45,Malaga,41
+46,Yokohama,46
+47,Kobe,46
+48,Nagasaki,46
+49,Sendai,46
+50,Kawasaki,46
+51,Chennai,13
+52,Malappuram,51

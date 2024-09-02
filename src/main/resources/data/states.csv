@@ -1,0 +1,52 @@
+id,name,country_id
+1,California,1
+2,Texas,1
+3,New York,1
+4,Florida,1
+5,Illinois,1
+6,Ontario,2
+7,Quebec,2
+8,Alberta,2
+9,British Columbia,2
+10,Manitoba,2
+11,Maharashtra,3
+12,Uttar Pradesh,3
+13,Tamil Nadu,3
+14,Karnataka,3
+15,West Bengal,3
+16,England,4
+17,Scotland,4
+18,Wales,4
+19,Northern Ireland,4
+20,London,4
+21,New South Wales,5
+22,Victoria,5
+23,Queensland,5
+24,South Australia,5
+25,Western Australia,5
+26,Île-de-France,6
+27,Auvergne-Rhône-Alpes,6
+28,Provence-Alpes-Côte d'Azur,6
+29,Occitanie,6
+30,Grand Est,6
+31,Bavaria,7
+32,Berlin,7
+33,Hesse,7
+34,North Rhine-Westphalia,7
+35,Baden-Württemberg,7
+36,Lazio,8
+37,Lombardy,8
+38,Campania,8
+39,Tuscany,8
+40,Sicily,8
+41,Madrid,9
+42,Barcelona,9
+43,Valencia,9
+44,Seville,9
+45,Malaga,9
+46,Tokyo,10
+47,Osaka,10
+48,Kyoto,10
+49,Hiroshima,10
+50,Nagoya,10
+51,Kerala,3
