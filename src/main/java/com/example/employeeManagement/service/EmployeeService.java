@@ -6,6 +6,7 @@ import com.example.employeeManagement.model.*;
 import com.example.employeeManagement.repository.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import com.google.common.cache.Cache;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -57,6 +58,10 @@ public class EmployeeService {
     @Autowired
     private AuthenticationService authenticationService;
 
+    @Autowired
+    private Cache<String, Employee> employeeCache;
+
+
     private static final Logger logger = LoggerFactory.getLogger(AuthenticationController.class);
 
 
@@ -65,7 +70,23 @@ public class EmployeeService {
     }
 
     public Optional<Employee> getEmployeeById(Long id) {
-        return employeeRepository.findById(id);
+        String key = "employee-" + id;
+        Employee employee = employeeCache.getIfPresent(key);
+
+        if (employee == null) {
+            logger.info("Cache miss for employee with ID: {}", id); // Log cache miss
+            Optional<Employee> optionalEmployee = employeeRepository.findById(id);
+
+            optionalEmployee.ifPresent(emp -> {
+                employeeCache.put(key, emp);
+                logger.info("Employee with ID: {} added to cache.", id); // Log caching
+            });
+
+            return optionalEmployee;
+        }
+
+        logger.info("Cache hit for employee with ID: {}", id); // Log cache hit
+        return Optional.of(employee);
     }
 
     public Page<Employee> getEmployees(Specification<Employee> spec, Pageable pageable) {
@@ -208,5 +229,10 @@ public class EmployeeService {
 
     public void deleteEmployee(Long id) {
         employeeRepository.deleteById(id);
+    }
+
+    // Method to clear the cache
+    public void clearCache() {
+        employeeCache.invalidateAll(); // Clears the entire cache
     }
 }

@@ -40,6 +40,12 @@ jwt:
   secret: wTL5DXgrHJhbBMpsg9dtMQ+5f/MxyJGMlTXrZ/QlqLw=
   expiration-time: 86400000
 
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+
 logging:
   level:
     org.springframework.security: DEBUG

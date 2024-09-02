@@ -173,7 +173,6 @@ public class DataInitializer {
         }
     }
 
-
     private void loadDepartments() throws IOException, CsvValidationException {
         Resource resource = new ClassPathResource("data/departments.csv");
         try (CSVReader reader = new CSVReader(new InputStreamReader(resource.getInputStream()))) {
@@ -209,7 +208,6 @@ public class DataInitializer {
         }
     }
 
-
     private void loadGrades() throws IOException, CsvValidationException {
         Resource resource = new ClassPathResource("data/grades.csv");
         try (CSVReader reader = new CSVReader(new InputStreamReader(resource.getInputStream()))) {
@@ -234,8 +232,6 @@ public class DataInitializer {
         }
     }
 
-
-
     private void loadCountries() throws IOException, CsvValidationException {
         Resource resource = new ClassPathResource("data/countries.csv");
         try (CSVReader reader = new CSVReader(new InputStreamReader(resource.getInputStream()))) {
@@ -253,7 +249,6 @@ public class DataInitializer {
             }
         }
     }
-
 
     private void loadEmployees() throws IOException, CsvValidationException {
         Resource resource = new ClassPathResource("data/employees.csv");
@@ -330,6 +325,5 @@ public class DataInitializer {
             }
         }
     }
-
 
 }
